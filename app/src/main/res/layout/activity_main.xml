@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:ads="http://schemas.android.com/apk/libs/com.google.ads"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:weightSum="100">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+
+            android:layout_weight="45"
+            android:contentDescription="@string/desc_img"
+            app:srcCompat="@drawable/logo" />
+
+        <Button
+            android:id="@+id/buttonNewProject"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:text="@string/button_new_project"
+            android:layout_weight="10"/>
+
+        <Button
+            android:id="@+id/buttonOpenProject"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:text="@string/button_open_project"
+            android:layout_weight="10"/>
+        <Button
+            android:id="@+id/buttonManageProjects"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:text="@string/button_manage"
+            android:layout_weight="10"/>
+
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adViewMain"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            app:adSize="BANNER"
+            app:adUnitId="ca-app-pub-5186513771147829/9346873101"
+            android:layout_weight="25"/>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
