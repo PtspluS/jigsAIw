@@ -18,7 +18,9 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,12 +37,22 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +67,9 @@ public class CaptureActivity extends AppCompatActivity {
     private boolean generalMainPicture;
     private boolean photoTook;
     private Button btnNext;
+    private int id = 0;
+    private int countPicture = 0;
+    private InterstitialAd mInterAd;
 
     private TextureView textureView;
     private CameraDevice cameraDevice;
@@ -74,7 +89,6 @@ public class CaptureActivity extends AppCompatActivity {
     CaptureRequest.Builder captureRequestBuilder;
     CameraCaptureSession cameraCaptureSession;
 
-    private int photoID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +96,7 @@ public class CaptureActivity extends AppCompatActivity {
         setContentView(R.layout.capture);
 
         this.generalMainPicture = getIntent().getBooleanExtra("General Map Picture", true);
+        this.id = getIntent().getIntExtra("ID", 0);
 
         Button btnCapture = findViewById(R.id.buttonCapture);
         this.btnNext = findViewById(R.id.buttonNext);
@@ -99,10 +114,27 @@ public class CaptureActivity extends AppCompatActivity {
             btnNext.setAlpha(0.25f);
 
         }
-
+        /*
         AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
         adView.setAdUnitId("ca-app-pub-5186513771147829/1763896558");
+        */
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        // banner
+        AdView mAdView = findViewById(R.id.adViewCapture);
+        //mAdView.setAdUnitId("ca-app-pub-5186513771147829/1763896558");
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+        // interad
+        mInterAd = new InterstitialAd(this);
+        mInterAd.setAdUnitId("ca-app-pub-5186513771147829/7430725002");
+        mInterAd.loadAd(new AdRequest.Builder().build());
 
         textureView = findViewById(R.id.textureView);
         assert textureView != null;
@@ -126,7 +158,8 @@ public class CaptureActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cameraDevice.close();
+        if(cameraDevice!=null)
+            cameraDevice.close();
     }
 
     private void captureImage() throws CameraAccessException {
@@ -162,12 +195,86 @@ public class CaptureActivity extends AppCompatActivity {
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(1));
 
-        File file = new File(Environment.getExternalStorageDirectory(),"/test"+String.valueOf(photoID)+".jpg");
+        String name;
+        if(this.generalMainPicture){
+            name = "MainPicture";
+        }else {
+            name = "Piece_num"+String.valueOf(this.countPicture);
+            this.countPicture++;
+        }
+
+        final File file = new File(Environment.getExternalStorageDirectory(),"jigsAIw/"+name+String.valueOf(id)+".jpg");
         if(!file.exists()){
-            Log.i("Cap", "Photo captured");
+
+            ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
+                @Override
+                public void onImageAvailable(ImageReader reader) {
+                    //Log.i("Cap", "Photo captured");
+                    Image img = null;
+
+                    img = reader.acquireLatestImage();
+
+                    ByteBuffer buffer = img.getPlanes()[0].getBuffer();
+
+                    byte[] bytes = new byte[buffer.capacity()];
+                    buffer.get(bytes);
+
+                    try {
+                        save(bytes, file);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (img!=null){
+                            img.close();
+                        }
+                    }
+                }
+
+            };
+
+            reader.setOnImageAvailableListener(readerListener, backgroundHandler);
+
+            final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
+                @Override
+                public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
+                    super.onCaptureCompleted(session, request, result);
+
+                    Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
+
+
+                }
+            };
+
+            cameraDevice.createCaptureSession(outputSurface, new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onConfigured(CameraCaptureSession session) {
+                    try {
+                        session.capture(captureBuilder.build(),captureListener, backgroundHandler);
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onConfigureFailed(CameraCaptureSession session) {
+
+                }
+            }, backgroundHandler);
+
             AlertDialog pop = this.generatePopUp(getString(R.string.pop_up_title),getString(R.string.pop_up_captured_image_txt));
             pop.show();
         }
+    }
+
+    private void save(byte[] bytes, File file) throws IOException {
+        OutputStream outputStream = null;
+
+        outputStream = new FileOutputStream(file);
+        outputStream.write(bytes);
+
+        outputStream.close();
     }
 
     TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
@@ -347,7 +454,7 @@ public class CaptureActivity extends AppCompatActivity {
         builder.setCancelable(true);
         builder.setTitle(title);
         builder.setMessage(message);
-        builder.setPositiveButton("Confirm",
+        builder.setPositiveButton(android.R.string.ok,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -370,13 +477,33 @@ public class CaptureActivity extends AppCompatActivity {
      * Function to change activity
      */
     private void next(){
-        if(this.generalMainPicture){
+        if(cameraDevice!=null)
             cameraDevice.close();
+        if(this.generalMainPicture){
+
             Intent intent = new Intent(CaptureActivity.this, CaptureActivity.class);
             intent.putExtra("General Map Picture", false);
+            intent.putExtra("ID", this.id);
             startActivity(intent);
+
+        } else if (!this.generalMainPicture){
+
+            if(mInterAd.isLoaded()){
+                mInterAd.show();
+            } else {
+                try {
+                    Thread.sleep(1000);
+                    mInterAd.show();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // TODO create new intent and link it
         }
     }
+
+
 }
 
 
