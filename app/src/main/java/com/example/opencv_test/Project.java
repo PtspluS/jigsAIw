@@ -1,10 +1,11 @@
 package com.example.opencv_test;
 
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public class Project {
+public class Project implements Serializable {
     private String name;
     private List<Piece> pieces;
     private String pathToGlobalImage;

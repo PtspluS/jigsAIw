@@ -2,7 +2,9 @@ package com.example.opencv_test;
 
 import android.media.Image;
 
-public class Piece {
+import java.io.Serializable;
+
+public class Piece implements Serializable {
     private String pathImage;
     private Image image;
 

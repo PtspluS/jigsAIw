@@ -28,5 +28,9 @@ public class AnalyseImageThread extends Thread {
 
     }
 
+    private void cutPieces(){
+
+    }
+
 
 }

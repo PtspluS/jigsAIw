@@ -34,6 +34,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -70,6 +71,10 @@ public class CaptureActivity extends AppCompatActivity {
     private int id = 0;
     private int countPicture = 0;
     private InterstitialAd mInterAd;
+    // Path to the main picture
+    private String pathMainPicture;
+    // Path to the picture of pieces
+    private List<String> pathPiecePicture;
 
     private TextureView textureView;
     private CameraDevice cameraDevice;
@@ -97,6 +102,7 @@ public class CaptureActivity extends AppCompatActivity {
 
         this.generalMainPicture = getIntent().getBooleanExtra("General Map Picture", true);
         this.id = getIntent().getIntExtra("ID", 0);
+        this.pathMainPicture = getIntent().getStringExtra("path Main Picture");
 
         Button btnCapture = findViewById(R.id.buttonCapture);
         this.btnNext = findViewById(R.id.buttonNext);
@@ -114,11 +120,6 @@ public class CaptureActivity extends AppCompatActivity {
             btnNext.setAlpha(0.25f);
 
         }
-        /*
-        AdView adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-5186513771147829/1763896558");
-        */
 
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
@@ -127,7 +128,6 @@ public class CaptureActivity extends AppCompatActivity {
         });
         // banner
         AdView mAdView = findViewById(R.id.adViewCapture);
-        //mAdView.setAdUnitId("ca-app-pub-5186513771147829/1763896558");
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
@@ -221,6 +221,11 @@ public class CaptureActivity extends AppCompatActivity {
 
                     try {
                         save(bytes, file);
+                        if(generalMainPicture){
+                            pathMainPicture = String.valueOf(file);
+                        } else {
+                            pathPiecePicture.add(String.valueOf(file));
+                        }
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -484,6 +489,7 @@ public class CaptureActivity extends AppCompatActivity {
             Intent intent = new Intent(CaptureActivity.this, CaptureActivity.class);
             intent.putExtra("General Map Picture", false);
             intent.putExtra("ID", this.id);
+            intent.putExtra("path Main Picture", this.pathMainPicture);
             startActivity(intent);
 
         } else if (!this.generalMainPicture){
