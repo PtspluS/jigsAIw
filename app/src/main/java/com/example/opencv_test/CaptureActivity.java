@@ -357,7 +357,8 @@ public class CaptureActivity extends AppCompatActivity {
 
         @Override
         public void onError(CameraDevice camera, int error) {
-            cameraDevice.close();
+            if(cameraDevice!=null)
+                cameraDevice.close();
             cameraDevice = null;
         }
     };
@@ -506,6 +507,13 @@ public class CaptureActivity extends AppCompatActivity {
             }
 
             // TODO create new intent and link it
+            Intent intent = new Intent(CaptureActivity.this, CreateProjectActivity.class);
+
+            intent.putExtra("ID", this.id);
+            intent.putExtra("pathMainPicture", this.pathMainPicture);
+            intent.putExtra("pathImagePieces", (ArrayList<String>) this.pathPiecePicture);
+
+            startActivity(intent);
         }
     }
 

@@ -14,13 +14,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textViewCreateProject"
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adViewNatifCreateProject"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight="25"
-            android:gravity="center"
-            android:text="@string/loading" />
+            app:adSize="FLUID"
+            app:adUnitId="ca-app-pub-5186513771147829/6183192130"
+            android:layout_weight="45" />
 
         <ProgressBar
             android:id="@+id/progressBarCircle"
@@ -30,11 +30,19 @@
             android:layout_weight="30" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/button_next_create_project"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="15"
+            android:layout_weight="10"
             android:text="@string/button_next" />
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adViewBannerCreateProject"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10"
+            app:adSize="BANNER"
+            app:adUnitId="ca-app-pub-5186513771147829/1198265244" />
 
 
     </LinearLayout>
