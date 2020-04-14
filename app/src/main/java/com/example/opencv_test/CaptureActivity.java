@@ -75,6 +75,7 @@ public class CaptureActivity extends AppCompatActivity {
     private String pathMainPicture;
     // Path to the picture of pieces
     private List<String> pathPiecePicture;
+    private File file;
 
     private TextureView textureView;
     private CameraDevice cameraDevice;
@@ -203,7 +204,10 @@ public class CaptureActivity extends AppCompatActivity {
             this.countPicture++;
         }
 
-        final File file = new File(Environment.getExternalStorageDirectory(),"jigsAIw/"+name+String.valueOf(id)+".jpg");
+        String nameSave = name+id+"_"+countPicture+".jpg";
+        // String nameSave = name+id+"_"+countPicture+".jpg";
+        file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/jigsAIw/", nameSave);
+
         if(!file.exists()){
 
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
@@ -220,7 +224,7 @@ public class CaptureActivity extends AppCompatActivity {
                     buffer.get(bytes);
 
                     try {
-                        save(bytes, file);
+                        save(bytes);
                         if(generalMainPicture){
                             pathMainPicture = String.valueOf(file);
                         } else {
@@ -273,10 +277,9 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    private void save(byte[] bytes, File file) throws IOException {
-        OutputStream outputStream = null;
+    private void save(byte[] bytes) throws IOException {
 
-        outputStream = new FileOutputStream(file);
+        OutputStream outputStream = new FileOutputStream(file);
         outputStream.write(bytes);
 
         outputStream.close();
@@ -467,7 +470,7 @@ public class CaptureActivity extends AppCompatActivity {
                         btnNext.setAlpha(1.0f);
                     }
                 });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 next();
@@ -490,11 +493,10 @@ public class CaptureActivity extends AppCompatActivity {
             Intent intent = new Intent(CaptureActivity.this, CaptureActivity.class);
             intent.putExtra("General Map Picture", false);
             intent.putExtra("ID", this.id);
-            intent.putExtra("path Main Picture", this.pathMainPicture);
+            intent.putExtra("path Main Picture", pathMainPicture);
             startActivity(intent);
 
         } else if (!this.generalMainPicture){
-
             if(mInterAd.isLoaded()){
                 mInterAd.show();
             } else {
@@ -510,8 +512,8 @@ public class CaptureActivity extends AppCompatActivity {
             Intent intent = new Intent(CaptureActivity.this, CreateProjectActivity.class);
 
             intent.putExtra("ID", this.id);
-            intent.putExtra("pathMainPicture", this.pathMainPicture);
-            intent.putExtra("pathImagePieces", (ArrayList<String>) this.pathPiecePicture);
+            intent.putExtra("pathMainPicture", pathMainPicture);
+            intent.putExtra("pathImagePieces", (ArrayList<String>) pathPiecePicture);
 
             startActivity(intent);
         }

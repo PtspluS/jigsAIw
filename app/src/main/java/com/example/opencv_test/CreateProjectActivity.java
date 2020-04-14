@@ -1,5 +1,6 @@
 package com.example.opencv_test;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -11,6 +12,7 @@ import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class CreateProjectActivity extends AppCompatActivity {
@@ -18,6 +20,7 @@ public class CreateProjectActivity extends AppCompatActivity {
     private String pathMainImage;
     private String[] pathImagePictures;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +45,9 @@ public class CreateProjectActivity extends AppCompatActivity {
 
         Toast.makeText(this, R.string.loading, Toast.LENGTH_LONG).show();
 
-        ProgressBar bar = findViewById(R.id.progressBarCircle);
-
+        ProgressBar bar = findViewById(R.id.progressBar);
+        bar.setMin(0);
+        bar.setMax(pathImagePictures.length+1);
+        bar.setProgress(0,true);
     }
 }

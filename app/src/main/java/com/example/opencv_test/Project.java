@@ -6,36 +6,39 @@ import java.util.List;
 
 
 public class Project implements Serializable {
+    // id can not be moved it is used for link pictures
+    private String id;
+    // name can be changed
     private String name;
     private List<Piece> pieces;
     private String pathToGlobalImage;
 
     public Project(){
-        this.name = Double.toString(Math.random()*(1000));
+        this.id = Double.toString(Math.random()*(1000));
         this.pathToGlobalImage = null;
         this.pieces = null;
     }
 
-    public Project (String name){
-        this.name = name;
+    public Project (String id){
+        this.id = id;
         this.pathToGlobalImage = null;
         this.pieces = null;
     }
 
-    public Project(String name, String pathToGlobalImage){
-        this.name = name;
+    public Project(String id, String pathToGlobalImage){
+        this.id = id;
         this.pathToGlobalImage = pathToGlobalImage;
         this.pieces = null;
     }
 
-    public Project(String name, List<Piece> pieces){
-        this.name = name;
+    public Project(String id, List<Piece> pieces){
+        this.id = id;
         this.pathToGlobalImage = null;
         this.pieces = pieces;
     }
 
-    public Project(String name, String pathToGlobalImage, List<Piece> pieces){
-        this.name = name;
+    public Project(String id, String pathToGlobalImage, List<Piece> pieces){
+        this.id = id;
         this.pathToGlobalImage = pathToGlobalImage;
         this.pieces = pieces;
     }
