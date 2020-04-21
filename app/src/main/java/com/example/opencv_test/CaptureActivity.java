@@ -200,11 +200,11 @@ public class CaptureActivity extends AppCompatActivity {
         if(this.generalMainPicture){
             name = "MainPicture";
         }else {
-            name = "Piece_num"+String.valueOf(this.countPicture);
+            name = "Piece_num_"+String.valueOf(this.countPicture);
             this.countPicture++;
         }
 
-        String nameSave = '/'+name+"_"+countPicture+".jpg";
+        String nameSave = '/'+name+".jpg";
         // String nameSave = name+id+"_"+countPicture+".jpg";
         file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/jigsAIw/id_"+id, nameSave);
 
@@ -469,6 +469,12 @@ public class CaptureActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         btnNext.setAlpha(1.0f);
+                        btnNext.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                next();
+                            }
+                        });
                     }
                 });
         builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -487,8 +493,9 @@ public class CaptureActivity extends AppCompatActivity {
      * Function to change activity
      */
     private void next(){
-        if(cameraDevice!=null)
+        if(cameraDevice!=null) {
             cameraDevice.close();
+        }
         if(this.generalMainPicture){
 
             Intent intent = new Intent(CaptureActivity.this, CaptureActivity.class);
@@ -499,7 +506,12 @@ public class CaptureActivity extends AppCompatActivity {
 
         } else if (!this.generalMainPicture){
             if(mInterAd.isLoaded()){
-                mInterAd.show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mInterAd.show();
+                    }
+                });
             } else {
                 try {
                     Thread.sleep(5*1000);
@@ -524,12 +536,24 @@ public class CaptureActivity extends AppCompatActivity {
         if(cameraDevice!= null){
             cameraDevice.close();
         }
+        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/jigsAIw/id_"+id);
+        deleteDirectory(dir);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
+    }
+
+    private boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
     }
 }
 
