@@ -2,6 +2,7 @@ package com.example.opencv_test;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -10,10 +11,10 @@ public class Project implements Serializable {
     private String id;
     // name can be changed
     private String name;
-    private List<Piece> pieces;
+    private ArrayList<Piece> pieces;
     private String pathToGlobalImage;
 
-    public Project(){
+    public Project(int id, String globalImagePathAnalysed, ArrayList<Piece> pieces){
         this.id = Double.toString(Math.random()*(1000));
         this.pathToGlobalImage = null;
         this.pieces = null;
@@ -31,13 +32,13 @@ public class Project implements Serializable {
         this.pieces = null;
     }
 
-    public Project(String id, List<Piece> pieces){
+    public Project(String id, ArrayList<Piece> pieces){
         this.id = id;
         this.pathToGlobalImage = null;
         this.pieces = pieces;
     }
 
-    public Project(String id, String pathToGlobalImage, List<Piece> pieces){
+    public Project(String id, String pathToGlobalImage, ArrayList<Piece> pieces){
         this.id = id;
         this.pathToGlobalImage = pathToGlobalImage;
         this.pieces = pieces;
@@ -47,7 +48,7 @@ public class Project implements Serializable {
         return pieces;
     }
 
-    public void setPieces(List<Piece> pieces) {
+    public void setPieces(ArrayList<Piece> pieces) {
         this.pieces = pieces;
     }
 

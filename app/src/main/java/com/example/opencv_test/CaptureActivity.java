@@ -74,7 +74,7 @@ public class CaptureActivity extends AppCompatActivity {
     // Path to the main picture
     private String pathMainPicture;
     // Path to the picture of pieces
-    private List<String> pathPiecePicture;
+    private ArrayList<String> pathPiecePicture = new ArrayList<String>();
     private File file;
 
     private TextureView textureView;
@@ -204,9 +204,9 @@ public class CaptureActivity extends AppCompatActivity {
             this.countPicture++;
         }
 
-        String nameSave = name+id+"_"+countPicture+".jpg";
+        String nameSave = '/'+name+"_"+countPicture+".jpg";
         // String nameSave = name+id+"_"+countPicture+".jpg";
-        file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/jigsAIw/", nameSave);
+        file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/jigsAIw/id_"+id, nameSave);
 
         if(!file.exists()){
 
@@ -225,16 +225,16 @@ public class CaptureActivity extends AppCompatActivity {
 
                     try {
                         save(bytes);
-                        if(generalMainPicture){
-                            pathMainPicture = String.valueOf(file);
-                        } else {
-                            pathPiecePicture.add(String.valueOf(file));
-                        }
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
+                        if(generalMainPicture){
+                            pathMainPicture = String.valueOf(file);
+                        } else {
+                            pathPiecePicture.add(String.valueOf(file));
+                        }
                         if (img!=null){
                             img.close();
                         }
@@ -272,9 +272,10 @@ public class CaptureActivity extends AppCompatActivity {
                 }
             }, backgroundHandler);
 
-            AlertDialog pop = this.generatePopUp(getString(R.string.pop_up_title),getString(R.string.pop_up_captured_image_txt));
-            pop.show();
+
         }
+        AlertDialog pop = this.generatePopUp(getString(R.string.pop_up_title),getString(R.string.pop_up_captured_image_txt));
+        pop.show();
     }
 
     private void save(byte[] bytes) throws IOException {
@@ -501,9 +502,9 @@ public class CaptureActivity extends AppCompatActivity {
                 mInterAd.show();
             } else {
                 try {
-                    Thread.sleep(1000);
+                    //Thread.sleep(1000);
                     mInterAd.show();
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -519,7 +520,19 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(cameraDevice!= null){
+            cameraDevice.close();
+        }
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
 }
 
 

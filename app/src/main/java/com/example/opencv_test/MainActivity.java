@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button btnNewProject = findViewById(R.id.buttonNewProject);
         Button btnOpenProject = findViewById(R.id.buttonOpenProject);
+        Button btnManageProjects = findViewById(R.id.buttonManageProjects);
 
         btnNewProject.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,9 +56,30 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
                 intent.putExtra("General Map Picture", true);
                 // create a id to be sure that all the img for the same project start with the same id
-                Random r = new Random();
-                int id = r.nextInt(10000);
+                // create repo only for the project
+                File dir1;
+                int id = 0;
+                boolean newCreated = false;
+                do{
+                    Random r = new Random();
+                    id = r.nextInt(10000);
+                    dir1 = new File(Environment.getExternalStorageDirectory()+"/jigsAIw/id_"+id);
+
+                    if(!dir1.exists()) {
+                        dir1.mkdir();
+                        newCreated = true;
+                    }
+
+                } while (!newCreated);
                 intent.putExtra("ID Project", id);
+                startActivity(intent);
+            }
+        });
+
+        btnManageProjects.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ManageActivity.class);
                 startActivity(intent);
             }
         });

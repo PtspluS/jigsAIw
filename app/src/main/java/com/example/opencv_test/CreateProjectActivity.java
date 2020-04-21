@@ -1,7 +1,9 @@
 package com.example.opencv_test;
 
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -20,10 +22,14 @@ public class CreateProjectActivity extends AppCompatActivity {
     private String pathMainImage;
     private String[] pathImagePictures;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    private AsyncTaskImageAnalyse task;
+    private Button btnNext;
+    private ProgressBar bar;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.createproject);
 
         MobileAds.initialize(this,new OnInitializationCompleteListener() {
             @Override
@@ -45,9 +51,45 @@ public class CreateProjectActivity extends AppCompatActivity {
 
         Toast.makeText(this, R.string.loading, Toast.LENGTH_LONG).show();
 
-        ProgressBar bar = findViewById(R.id.progressBar);
-        bar.setMin(0);
-        bar.setMax(pathImagePictures.length+1);
-        bar.setProgress(0,true);
+        bar = findViewById(R.id.progressBar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            bar.setMin(0);
+            bar.setMax(pathImagePictures.length*2+2);
+            bar.setProgress(0);
+        }
+
+        btnNext = findViewById(R.id.button_next_create_project);
+        btnNext.setAlpha(0.2f);
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(task.getStatus() == AsyncTask.Status.RUNNING){
+            task.cancel(true);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(task == null){
+            task = new AsyncTaskImageAnalyse(btnNext,bar,pathMainImage,id);
+            Project project = task.doInBackground(pathImagePictures);
+        }
     }
 }
