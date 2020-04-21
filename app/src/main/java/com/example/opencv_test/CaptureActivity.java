@@ -502,19 +502,17 @@ public class CaptureActivity extends AppCompatActivity {
                 mInterAd.show();
             } else {
                 try {
-                    //Thread.sleep(1000);
-                    mInterAd.show();
-                } catch (Exception e) {
+                    Thread.sleep(5*1000);
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
-            // TODO create new intent and link it
             Intent intent = new Intent(CaptureActivity.this, CreateProjectActivity.class);
 
             intent.putExtra("ID", this.id);
             intent.putExtra("pathMainPicture", pathMainPicture);
-            intent.putExtra("pathImagePieces", (ArrayList<String>) pathPiecePicture);
+            intent.putExtra("pathImagePieces", pathPiecePicture);
 
             startActivity(intent);
         }
