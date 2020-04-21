@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 } while (!newCreated);
-                intent.putExtra("ID Project", id);
+                intent.putExtra("ID", id);
                 startActivity(intent);
             }
         });
