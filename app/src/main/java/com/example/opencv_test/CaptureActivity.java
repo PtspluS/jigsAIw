@@ -74,7 +74,7 @@ public class CaptureActivity extends AppCompatActivity {
     // Path to the main picture
     private String pathMainPicture;
     // Path to the picture of pieces
-    private ArrayList<String> pathPiecePicture = new ArrayList<String>();
+    private ArrayList<String> pathPiecePicture = new ArrayList<>();
     private File file;
 
     private TextureView textureView;
