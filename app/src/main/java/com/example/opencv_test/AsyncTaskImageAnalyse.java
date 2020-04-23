@@ -1,5 +1,7 @@
 package com.example.opencv_test;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
@@ -17,6 +19,9 @@ public class AsyncTaskImageAnalyse extends AsyncTask<String, Double, Project> {
     private String globalImagePathAnalysed;
     private Double progress0;
     private Double progress1;
+    private Activity activity;
+
+    private Project project;
 
     private Button btnNext;
     private ProgressBar bar;
@@ -24,7 +29,10 @@ public class AsyncTaskImageAnalyse extends AsyncTask<String, Double, Project> {
     private ArrayList<String> paths;
     private ArrayList<Piece> pieces;
 
-    public AsyncTaskImageAnalyse(Button btn, ProgressBar bar, String path, int id){
+    public AsyncTaskImageAnalyse(Activity act,Button btn, ProgressBar bar, String path, int id){
+
+        this.activity = act;
+
         this.btnNext = btn;
         this.bar = bar;
         this.globalImagePath = path;
@@ -73,6 +81,8 @@ public class AsyncTaskImageAnalyse extends AsyncTask<String, Double, Project> {
         progress0 = (double)this.bar.getMax();
         publishProgress(progress0, progress1);
 
+        this.project = project;
+
         return project;
     }
 
@@ -86,13 +96,16 @@ public class AsyncTaskImageAnalyse extends AsyncTask<String, Double, Project> {
     }
 
     @Override
-    protected void onPostExecute(Project project) {
+    protected void onPostExecute(final Project project) {
         super.onPostExecute(project);
         btnNext.setAlpha(1.0f);
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ;
+                Intent intent = new Intent(activity, AssistantActivity.class);
+                intent.putExtra("project", project);
+
+                activity.startActivity(intent);
             }
         });
     }

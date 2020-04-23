@@ -88,7 +88,7 @@ public class CreateProjectActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(task == null){
-            task = new AsyncTaskImageAnalyse(btnNext,bar,pathMainImage,id);
+            task = new AsyncTaskImageAnalyse(this, btnNext,bar,pathMainImage,id);
             Project project = task.doInBackground(pathImagePictures);
         }
     }
