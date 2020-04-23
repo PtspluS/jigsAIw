@@ -14,12 +14,19 @@ import java.util.List;
 import org.opencv.*;
 import org.opencv.imgproc.Imgproc;
 
+/*
+* As a thread, it will analyse only one picture per time.
+* */
+
 public class AnalyseImageThread extends Thread {
 
     private String pathSrc;
     private boolean globalImage;
     private Mat srcImage;
+    // for only one picture
     private Mat dstImage;
+    // for list of picture
+    private ArrayList<Mat> piecesImage;
     private int id;
     private ArrayList<String> pathNewImages;
 
@@ -30,27 +37,29 @@ public class AnalyseImageThread extends Thread {
     /**
      * Function run when a picture is took
      * @param pathImage : path to the jpeg image
-     * @param globalImage : if true means that it's the picture of the global jigsaw
-     * @param id : id of the project
+     * @param globalImg : if true means that it's the picture of the global jigsaw
+     * @param idx : id of the project
      * @return tab of all the new path for the new analysed images
      */
-    public ArrayList<String> run(String pathImage, boolean globalImage, int id){
-        globalImage = globalImage;
+    public ArrayList<String> run(String pathImage, boolean globalImg, int idx){
+        globalImage = globalImg;
         pathSrc = pathImage;
         // create a matrix of the image
         srcImage = Imgcodecs.imread(pathImage);
-        id = id;
+        id = idx;
 
         if(globalImage){
             dstImage = correctPerspective(srcImage);
         } else{
-
+            piecesImage = cutPieces(srcImage);
         }
-        save();
+        pathNewImages = save();
         return pathNewImages;
     }
 
-    private Mat correctPerspective(Mat src){
+    private Mat correctPerspective(Mat img){
+        // copy img to src
+        Mat src = img.clone();
         // we put the image in gray, it's better for analyse
         Mat gray = new Mat(src.rows(), src.cols(), src.type());
         Mat thresh = new Mat(src.rows(), src.cols(), src.type());
@@ -87,14 +96,26 @@ public class AnalyseImageThread extends Thread {
         return new Mat();
     }
 
+    // TODO
     private ArrayList<Mat> cutPieces(Mat src){
         return new ArrayList<Mat>();
     }
 
-    private void save(){
+    /*
+    * Function which write image in path associated
+    * If global image path : ./id_#id/modified_pieces/globalImage.png
+    * else : ./id_#id/
+    * dstImage is write here
+    * */
+    private ArrayList<String> save(){
+        // path new images
+        ArrayList<String> newImagesPath = new ArrayList<String>();
+
         String path;
+
+        // if we run the global image
         if(globalImage) {
-            path = "globalImage";
+            path = "globalImage.png";
             File file = new File(pathSrc + "/modified_pieces/", path);
             try {
                 file.createNewFile();
@@ -102,18 +123,28 @@ public class AnalyseImageThread extends Thread {
                 e.printStackTrace();
             }
             Imgcodecs.imwrite(String.valueOf(file), dstImage);
-        }else{
-            for(String p : pathNewImages){
-                int index = pathNewImages.indexOf(p);
-                path = "modified_piece_num"+index;
+
+            newImagesPath.add(String.valueOf(file));
+
+            return newImagesPath;
+
+        }
+        // if we run pieces image
+        else{
+            for(Mat mat : piecesImage){
+                int index = pathNewImages.indexOf(mat);
+                path = "modified_piece_num"+index+".png";
                 File file = new File(pathSrc + "/modified_pieces/", path);
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Imgcodecs.imwrite(String.valueOf(file), dstImage);
+                Imgcodecs.imwrite(String.valueOf(file), mat);
+
+                newImagesPath.add(String.valueOf(file));
             }
+            return newImagesPath;
         }
     }
 
