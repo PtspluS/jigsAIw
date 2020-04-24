@@ -1,8 +1,10 @@
 package com.example.opencv_test;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 
@@ -96,9 +98,60 @@ public class AnalyseImageThread extends Thread {
         return img;
     }
 
-    // TODO
+
     private ArrayList<Mat> cutPieces(Mat src){
-        return new ArrayList<Mat>();
+
+        Mat img = src.clone();
+
+        // we put the image in gray, it's better for analyse
+        Mat gray = new Mat(src.rows(), src.cols(), src.type());
+        Mat thresh = new Mat(src.rows(), src.cols(), src.type());
+
+        Imgproc.cvtColor(img, gray, Imgproc.COLOR_BGR2GRAY);
+
+        Size kSize = new Size(5,5);
+
+        Imgproc.GaussianBlur(gray, gray, kSize, 0 );
+        Imgproc.adaptiveThreshold(gray, thresh, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 9, 1);
+
+        List<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.findContours(thresh, contours,new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+
+        double area = 0;
+        double peri = 0;
+        MatOfPoint2f poly = new MatOfPoint2f();
+        ArrayList<MatOfPoint2f> polyList = new ArrayList<>();
+
+        for(MatOfPoint contour : contours){
+            MatOfPoint2f curve = new MatOfPoint2f(contour);
+
+            area = Imgproc.contourArea(contour);
+
+            peri = Imgproc.arcLength(curve, true);
+
+            Imgproc.approxPolyDP(curve, poly,0.01*peri, true);
+
+            if(area > 100){
+                polyList.add(poly);
+            }
+        }
+
+        //int idx = 0
+        ArrayList<Mat> mats = new ArrayList<>();
+
+        for(MatOfPoint2f c : polyList){
+            Mat mask = new Mat(src.rows(), src.cols(), src.type(), Scalar.all(0));
+            Imgproc.drawContours(mask, (List<MatOfPoint>) c, -1, new Scalar(255,255,255), -1);
+
+            Mat mat = new Mat();
+
+            Core.bitwise_and(img, img, mat, mask);
+
+            mats.add(mat);
+        }
+
+
+        return mats;
     }
 
     /*

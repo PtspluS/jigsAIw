@@ -103,7 +103,7 @@ public class CaptureActivity extends AppCompatActivity {
 
         this.generalMainPicture = getIntent().getBooleanExtra("General Map Picture", true);
         this.id = getIntent().getIntExtra("ID", 0);
-        this.pathMainPicture = getIntent().getStringExtra("path Main Picture");
+        this.pathMainPicture = getIntent().getStringExtra("pathMainPicture");
 
         Button btnCapture = findViewById(R.id.buttonCapture);
         this.btnNext = findViewById(R.id.buttonNext);
@@ -501,7 +501,7 @@ public class CaptureActivity extends AppCompatActivity {
             Intent intent = new Intent(CaptureActivity.this, CaptureActivity.class);
             intent.putExtra("General Map Picture", false);
             intent.putExtra("ID", this.id);
-            intent.putExtra("path Main Picture", pathMainPicture);
+            intent.putExtra("pathMainPicture", pathMainPicture);
             startActivity(intent);
 
         } else if (!this.generalMainPicture){
