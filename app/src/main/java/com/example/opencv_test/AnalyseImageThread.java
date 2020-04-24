@@ -92,8 +92,8 @@ public class AnalyseImageThread extends Thread {
         Imgproc.approxPolyDP(new MatOfPoint2f(maxContours.toArray()), poly, 0.02*peri, true);
 
 
-        // delete this line after
-        return new Mat();
+        // delete this line after but by default you return the original image
+        return img;
     }
 
     // TODO
