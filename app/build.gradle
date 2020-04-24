@@ -32,6 +32,13 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation project(path: ':openCVLibrary3410')
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation 'com.google.android.gms:play-services-ads:18.1.1'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.google.android.gms:play-services-ads:19.0.1'
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.gms:play-services-ads:19.0.1'
+
+    compile 'com.android.support:recyclerview-v7:28.0.0'
+
 }

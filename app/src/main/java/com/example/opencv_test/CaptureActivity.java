@@ -18,7 +18,9 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,15 +34,26 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +68,14 @@ public class CaptureActivity extends AppCompatActivity {
     private boolean generalMainPicture;
     private boolean photoTook;
     private Button btnNext;
+    private int id = 0;
+    private int countPicture = 0;
+    private InterstitialAd mInterAd;
+    // Path to the main picture
+    private String pathMainPicture;
+    // Path to the picture of pieces
+    private ArrayList<String> pathPiecePicture = new ArrayList<>();
+    private File file;
 
     private TextureView textureView;
     private CameraDevice cameraDevice;
@@ -74,7 +95,6 @@ public class CaptureActivity extends AppCompatActivity {
     CaptureRequest.Builder captureRequestBuilder;
     CameraCaptureSession cameraCaptureSession;
 
-    private int photoID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +102,8 @@ public class CaptureActivity extends AppCompatActivity {
         setContentView(R.layout.capture);
 
         this.generalMainPicture = getIntent().getBooleanExtra("General Map Picture", true);
+        this.id = getIntent().getIntExtra("ID", 0);
+        this.pathMainPicture = getIntent().getStringExtra("pathMainPicture");
 
         Button btnCapture = findViewById(R.id.buttonCapture);
         this.btnNext = findViewById(R.id.buttonNext);
@@ -100,9 +122,20 @@ public class CaptureActivity extends AppCompatActivity {
 
         }
 
-        AdView adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-5186513771147829/1763896558");
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        // banner
+        AdView mAdView = findViewById(R.id.adViewCapture);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+        // interad
+        mInterAd = new InterstitialAd(this);
+        mInterAd.setAdUnitId("ca-app-pub-5186513771147829/7430725002");
+        mInterAd.loadAd(new AdRequest.Builder().build());
 
         textureView = findViewById(R.id.textureView);
         assert textureView != null;
@@ -126,7 +159,8 @@ public class CaptureActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cameraDevice.close();
+        if(cameraDevice!=null)
+            cameraDevice.close();
     }
 
     private void captureImage() throws CameraAccessException {
@@ -162,12 +196,94 @@ public class CaptureActivity extends AppCompatActivity {
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(1));
 
-        File file = new File(Environment.getExternalStorageDirectory(),"/test"+String.valueOf(photoID)+".jpg");
-        if(!file.exists()){
-            Log.i("Cap", "Photo captured");
-            AlertDialog pop = this.generatePopUp(getString(R.string.pop_up_title),getString(R.string.pop_up_captured_image_txt));
-            pop.show();
+        String name;
+        if(this.generalMainPicture){
+            name = "MainPicture";
+        }else {
+            name = "Piece_num_"+String.valueOf(this.countPicture);
+            this.countPicture++;
         }
+
+        String nameSave = '/'+name+".jpg";
+        // String nameSave = name+id+"_"+countPicture+".jpg";
+        file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/jigsAIw/id_"+id, nameSave);
+
+        if(!file.exists()){
+
+            ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
+                @Override
+                public void onImageAvailable(ImageReader reader) {
+                    //Log.i("Cap", "Photo captured");
+                    Image img = null;
+
+                    img = reader.acquireLatestImage();
+
+                    ByteBuffer buffer = img.getPlanes()[0].getBuffer();
+
+                    byte[] bytes = new byte[buffer.capacity()];
+                    buffer.get(bytes);
+
+                    try {
+                        save(bytes);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if(generalMainPicture){
+                            pathMainPicture = String.valueOf(file);
+                        } else {
+                            pathPiecePicture.add(String.valueOf(file));
+                        }
+                        if (img!=null){
+                            img.close();
+                        }
+                    }
+                }
+
+            };
+
+            reader.setOnImageAvailableListener(readerListener, backgroundHandler);
+
+            final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
+                @Override
+                public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
+                    super.onCaptureCompleted(session, request, result);
+
+                    Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
+
+
+                }
+            };
+
+            cameraDevice.createCaptureSession(outputSurface, new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onConfigured(CameraCaptureSession session) {
+                    try {
+                        session.capture(captureBuilder.build(),captureListener, backgroundHandler);
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onConfigureFailed(CameraCaptureSession session) {
+
+                }
+            }, backgroundHandler);
+
+
+        }
+        AlertDialog pop = this.generatePopUp(getString(R.string.pop_up_title),getString(R.string.pop_up_captured_image_txt));
+        pop.show();
+    }
+
+    private void save(byte[] bytes) throws IOException {
+
+        OutputStream outputStream = new FileOutputStream(file);
+        outputStream.write(bytes);
+
+        outputStream.close();
     }
 
     TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
@@ -245,7 +361,8 @@ public class CaptureActivity extends AppCompatActivity {
 
         @Override
         public void onError(CameraDevice camera, int error) {
-            cameraDevice.close();
+            if(cameraDevice!=null)
+                cameraDevice.close();
             cameraDevice = null;
         }
     };
@@ -347,14 +464,20 @@ public class CaptureActivity extends AppCompatActivity {
         builder.setCancelable(true);
         builder.setTitle(title);
         builder.setMessage(message);
-        builder.setPositiveButton("Confirm",
+        builder.setPositiveButton(android.R.string.ok,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         btnNext.setAlpha(1.0f);
+                        btnNext.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                next();
+                            }
+                        });
                     }
                 });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 next();
@@ -370,12 +493,67 @@ public class CaptureActivity extends AppCompatActivity {
      * Function to change activity
      */
     private void next(){
-        if(this.generalMainPicture){
+        if(cameraDevice!=null) {
             cameraDevice.close();
+        }
+        if(this.generalMainPicture){
+
             Intent intent = new Intent(CaptureActivity.this, CaptureActivity.class);
             intent.putExtra("General Map Picture", false);
+            intent.putExtra("ID", this.id);
+            intent.putExtra("pathMainPicture", pathMainPicture);
+            startActivity(intent);
+
+        } else if (!this.generalMainPicture){
+            if(mInterAd.isLoaded()){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mInterAd.show();
+                    }
+                });
+            } else {
+                try {
+                    Thread.sleep(5*1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Intent intent = new Intent(CaptureActivity.this, CreateProjectActivity.class);
+
+            intent.putExtra("ID", this.id);
+            intent.putExtra("pathMainPicture", pathMainPicture);
+            intent.putExtra("pathImagePieces", pathPiecePicture);
+
             startActivity(intent);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(cameraDevice!= null){
+            cameraDevice.close();
+        }
+        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/jigsAIw/id_"+id);
+        deleteDirectory(dir);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    private boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
     }
 }
 
