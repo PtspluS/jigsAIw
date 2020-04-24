@@ -1,6 +1,9 @@
 package com.example.opencv_test;
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,5 +73,18 @@ public class Project implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int size(){
+        return this.pieces.size();
+    }
+
+    public Bitmap drawposition(Piece piece){
+        return BitmapFactory.decodeFile(this.pathToGlobalImage);
+
+        /*TODO
+        * Read the image of the piece and use the function matchTemplate
+        * to draw a square at the position of the piece
+        * */
     }
 }
