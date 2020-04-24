@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">jigsAIw</string>
+    <string name="button_new_project">Nuovo progetto</string>
+    <string name="button_open_project">Aprire il progetto</string>
+    <string name="button_take_photo">Scattare una foto</string>
+    <string name="button_next">Seguente</string>
+    <string name="activity_main_photo">Scattare une foto del puzzle risolto</string>
+    <string name="activity_piece_photo">Scattare una foto dei pezzi del puzzle</string>
+    <string name="button_manage">Gestire i progetti</string>
+    <string name="desc_img">Logo</string>
+    <string name="pop_up_title">Foto scattata</string>
+    <string name="pop_up_captured_image_txt">Foto in elaborazione. Vuoi prenderne un\'altra ?</string>
+    <string name="loading">Caricamento</string>
+</resources>

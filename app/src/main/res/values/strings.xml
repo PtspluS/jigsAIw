@@ -4,8 +4,8 @@
     <string name="button_open_project">Open Project</string>
     <string name="button_take_photo">Takes picture</string>
     <string name="button_next">Next</string>
-    <string name="activity_main_photo">Takes picture of the solved puzzle</string>
-    <string name="activity_piece_photo">Takes pictures of pieces</string>
+    <string name="activity_main_photo">Take picture of the solved puzzle</string>
+    <string name="activity_piece_photo">Take pictures of pieces</string>
     <string name="button_manage">Manage projects</string>
     <string name="desc_img">Logo</string>
     <string name="pop_up_title">Picture taken</string>

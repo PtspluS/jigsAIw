@@ -1,5 +1,7 @@
 package com.example.opencv_test;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
@@ -7,6 +9,7 @@ import android.opengl.Matrix;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -16,10 +19,12 @@ import androidx.recyclerview.widget.RecyclerView.Adapter;
 
 public class AdapterAssistant extends Adapter<AdapterAssistant.MyViewHolder> {
 
-    Project project;
+    private Project project;
+    private Context context;
 
-    public AdapterAssistant(Project p){
+    public AdapterAssistant(Context context ,Project p){
         this.project = p;
+        this.context = context;
     }
 
     @NonNull
@@ -27,7 +32,7 @@ public class AdapterAssistant extends Adapter<AdapterAssistant.MyViewHolder> {
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.fragment_view_assitant, parent, false);
-        return new MyViewHolder(view);
+        return new MyViewHolder(view, context);
     }
 
     @Override
@@ -51,7 +56,9 @@ public class AdapterAssistant extends Adapter<AdapterAssistant.MyViewHolder> {
 
         private Piece piece;
 
-        public MyViewHolder(@NonNull View itemView) {
+        private Context context;
+
+        public MyViewHolder(@NonNull View itemView, Context context) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageFrag);
             btnSearch = itemView.findViewById(R.id.searchBtn);
@@ -63,6 +70,8 @@ public class AdapterAssistant extends Adapter<AdapterAssistant.MyViewHolder> {
                     displaySearching(piece);
                 }
             });
+
+            this.context = context;
         }
 
         public void display(Piece p){
@@ -76,8 +85,26 @@ public class AdapterAssistant extends Adapter<AdapterAssistant.MyViewHolder> {
 
         private void displaySearching(Piece p){
             Bitmap bitmap = project.drawposition(p);
-
             // TODO generate custom popup
+            //View popup = LayoutInflater.from(context).inflate(R.layout.custom_pop_up_activity, null);
+
+            final Dialog dialog = new Dialog(context);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.custom_pop_up_activity);
+
+            Button btnOk = dialog.findViewById(R.id.buttonOK);
+            ImageView img = dialog.findViewById(R.id.imageGlobalPlace);
+
+            btnOk.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.cancel();
+                }
+            });
+
+            img.setImageBitmap(bitmap);
+
+            dialog.show();
         }
     }
 }

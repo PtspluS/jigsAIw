@@ -10,6 +10,6 @@
     <string name="button_manage">Gérer les projets</string>
     <string name="desc_img">Logo</string>
     <string name="pop_up_title">Photo prise</string>
-    <string name="pop_up_captured_image_txt">Image en cours d\'analyse, voulez, vous en prendre une autre ?</string>
+    <string name="pop_up_captured_image_txt">Image en cours d\'analyse, voulez-vous en prendre une autre ?</string>
     <string name="loading">Chargement</string>
 </resources>

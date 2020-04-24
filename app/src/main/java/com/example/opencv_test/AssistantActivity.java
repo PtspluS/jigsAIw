@@ -20,7 +20,7 @@ public class AssistantActivity extends AppCompatActivity {
         final RecyclerView rv = findViewById(R.id.recyclerViewAssistant);
 
         rv.setLayoutManager(new LinearLayoutManager(this));
-        rv.setAdapter(new AdapterAssistant(project));
+        rv.setAdapter(new AdapterAssistant(this ,project));
     }
 
     @Override
