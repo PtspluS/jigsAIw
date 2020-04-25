@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">自動拼圖</string>
+    <string name="button_new_project">新拼圖</string>
+    <string name="button_open_project">開啟拼圖</string>
+    <string name="button_take_photo">擷取圖片</string>
+    <string name="button_next">下一個</string>
+    <string name="activity_main_photo">擷取完成的拼圖</string>
+    <string name="activity_piece_photo">擷取拼圖碎片</string>
+    <string name="button_manage">管理拼圖</string>
+    <string name="desc_img">商標</string>
+    <string name="pop_up_title">已擷取的圖片</string>
+    <string name="pop_up_captured_image_txt">資料處理中,您想要再玩一個嗎?</string>
+    <string name="loading">讀取中</string>
+</resources>

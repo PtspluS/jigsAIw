@@ -2,7 +2,7 @@
     <string name="app_name">jigsAIw</string>
     <string name="button_new_project">New Project</string>
     <string name="button_open_project">Open Project</string>
-    <string name="button_take_photo">Takes picture</string>
+    <string name="button_take_photo">Take picture</string>
     <string name="button_next">Next</string>
     <string name="activity_main_photo">Take picture of the solved puzzle</string>
     <string name="activity_piece_photo">Take pictures of pieces</string>
