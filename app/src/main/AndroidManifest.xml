@@ -30,6 +30,8 @@
 
         <activity android:name=".AssistantActivity"/>
 
+        <activity android:name=".ManageActivity"/>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-5186513771147829~3326305959"/>

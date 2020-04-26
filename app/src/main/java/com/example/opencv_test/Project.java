@@ -75,6 +75,10 @@ public class Project implements Serializable {
         this.name = name;
     }
 
+    public String getId(){
+        return this.id;
+    }
+
     public int size(){
         return this.pieces.size();
     }
