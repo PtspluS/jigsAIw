@@ -29,17 +29,20 @@
 
             <Button
                 android:id="@+id/buttonCapture"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="50"
-
+                android:background="@drawable/circle_button"
                 android:text="@string/button_take_photo" />
 
             <Button
                 android:id="@+id/buttonNext"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="50"
+                android:background="@drawable/circle_button"
                 android:text="@string/button_next" />
 
         </LinearLayout>
