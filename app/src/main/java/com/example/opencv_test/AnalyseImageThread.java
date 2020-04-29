@@ -1,5 +1,9 @@
 package com.example.opencv_test;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -15,6 +19,7 @@ import java.util.List;
 
 import org.opencv.*;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgcodecs.Imgcodecs;
 
 /*
 * As a thread, it will analyse only one picture per time.
@@ -47,7 +52,10 @@ public class AnalyseImageThread extends Thread {
         globalImage = globalImg;
         pathSrc = pathImage;
         // create a matrix of the image
-        srcImage = Imgcodecs.imread(pathImage);
+        Bitmap bit = BitmapFactory.decodeFile(pathImage);
+        //srcImage = Imgcodecs.imread(pathImage);
+        //srcImage = Highgui.imread(file.getAbsolutePath());
+        Utils.bitmapToMat(bit, srcImage);
         id = idx;
 
         if(globalImage){
